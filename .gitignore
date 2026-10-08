@@ -1,0 +1,36 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Env / secrets ---
+.env
+.env.local
+*.local
+
+# --- Database ---
+*.db
+*.sqlite3
+pgdata/
+
+# --- Data / artifacts ---
+data/exports/
+*.xlsx
+*.pdf
+!data/sample_sales.csv
+
+# --- Streamlit ---
+.streamlit/secrets.toml
+
+# --- OS / IDE ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.workbuddy-ai/

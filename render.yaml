@@ -1,0 +1,33 @@
+# Blueprint trien khai tren Render (https://render.com/docs/blueprint-spec)
+# Sau khi tao PostgreSQL (hoac dung Neon), dien DATABASE_URL vao bien moi truong cua service backend.
+
+services:
+  - type: web
+    name: demand-forecast-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    startCommand: python -m app.db.init_db && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: ENVIRONMENT
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: BACKEND_CORS_ORIGINS
+        sync: false
+      - key: FIRST_ADMIN_EMAIL
+        sync: false
+      - key: FIRST_ADMIN_PASSWORD
+        sync: false
+      - key: LLM_PROVIDER
+        value: none
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false

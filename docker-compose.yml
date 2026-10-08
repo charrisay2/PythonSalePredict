@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: demand
+      POSTGRES_PASSWORD: demand
+      POSTGRES_DB: demand_forecast
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U demand"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg2://demand:demand@db:5432/demand_forecast
+      SECRET_KEY: dev-secret-change-me-in-production
+      BACKEND_CORS_ORIGINS: http://localhost:8501,http://127.0.0.1:8501
+      LLM_PROVIDER: none
+      FIRST_ADMIN_EMAIL: admin@example.com
+      FIRST_ADMIN_PASSWORD: Admin@12345
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "python -m app.db.init_db &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  frontend:
+    build: ./frontend
+    environment:
+      API_BASE_URL: http://backend:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend
+    command: >
+      streamlit run app.py
+      --server.port 8501
+      --server.address 0.0.0.0
+      --server.headless true
+
+volumes:
+  pgdata:
